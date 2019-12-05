@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikijs
+  namespace: wikijs
+  labels:
+    app: wikijs
+spec:
+  selector:
+    matchLabels:
+      app: wikijs
+  template:
+    metadata:
+      labels:
+        app: wikijs
+    spec:
+      containers:
+      - name: wikijs
+        image: requarks/wiki:2
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DB_TYPE
+          value: postgres
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: wikijs-postgresql-secret
+              key: POSTGRES_DB_HOST
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: wikijs-postgresql-secret
+              key: POSTGRES_DB
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: wikijs-postgresql-secret
+              key: POSTGRES_USER
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: wikijs-postgresql-secret
+              key: POSTGRES_PASSWORD
+        ports:
+        - containerPort: 3000
+          name: http
